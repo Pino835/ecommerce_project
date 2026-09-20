@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/menu.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="menu">
+
+    <h1>Hello User!</h1>
+    <p>Welcome to your dashboard!</p>
+
+    <div class="category">
+        <h2>Filtros</h2>
+        <ul>
+            {% for category in categorias %}
+            <li><a href="#">{{ category.nombre }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="productos-cards">
+        {% for producto in productos %}
+        <a href="#" class="card">
+            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+            <div class="container">
+                <h4><b>{{ producto.nombre }}</b></h4>
+                <p>{{ producto.descripcion }}</p>
+                <p>Price: ${{ producto.precio }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+</section>
+{% endblock %}

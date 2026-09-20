@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Perfil{% endblock %}
+
+{% block styles %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/perfil.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+    <section class="perfil">
+        <div class="perfil-container">
+            <div class="perfil-card">
+                <div class="perfil-header">
+                    <h1>{{ cliente.usuario.username }}</h1>
+                    <h2>Información del Perfil</h2>
+                </div>
+                <p><strong>Nombre:</strong> {{ cliente.usuario.first_name }} {{ cliente.usuario.last_name }}</p>
+                <p><strong>Email:</strong> {{ cliente.usuario.email }}</p>
+                <p><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+                <p><strong>Provincia:</strong> {{ cliente.provincia }}</p>
+                <p><strong>Cantón:</strong> {{ cliente.canton }}</p>
+                <p><strong>Distrito:</strong> {{ cliente.distrito }}</p>
+                <p><strong>Dirección:</strong> {{ cliente.direccion }}</p>
+                <a href="#" class="edit-button">
+                    <span class="button-text">Editar Perfil</span>
+                    <div class="button-loader">
+                        <div class="loader-circle"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Registro{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/registro.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="registro">
+    <div class="registro-container">
+        <div class="registro-card">
+
+            <div class="registro-header">
+                <h1>CREAR CUENTA</h1>
+                <p>Complete sus datos para registrarse</p>
+
+                {% if messages %}
+                {% for message in messages %}
+                <div class="error-message">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
+            </div>
+
+            <form class="registro-form" method="POST">
+                {% csrf_token %}
+
+                <h3 class="form-section-title">Datos de acceso</h3>
+
+                <div class="form-field">
+                    <input type="text" id="username" name="username" required autocomplete="username">
+                    <label for="username">Usuario</label>
+                    <div class="field-line"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <input type="text" id="first_name" name="first_name" required>
+                        <label for="first_name">Nombre</label>
+                        <div class="field-line"></div>
+                    </div>
+
+                    <div class="form-field">
+                        <input type="text" id="last_name" name="last_name" required>
+                        <label for="last_name">Apellido</label>
+                        <div class="field-line"></div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <input type="email" id="email" name="email" required autocomplete="email">
+                    <label for="email">Correo electrónico</label>
+                    <div class="field-line"></div>
+                </div>
+
+                <div class="form-field">
+                    <input type="password" id="password1" name="password1" required autocomplete="new-password">
+                    <label for="password1">Contraseña</label>
+                    <div class="field-line"></div>
+                </div>
+
+                <div class="form-field">
+                    <input type="password" id="password2" name="password2" required autocomplete="new-password">
+                    <label for="password2">Confirmar contraseña</label>
+                    <div class="field-line"></div>
+                </div>
+
+                <h3 class="form-section-title">Datos de contacto</h3>
+
+                <div class="form-field">
+                    <input type="tel" id="telefono" name="telefono" maxlength="20">
+                    <label for="telefono">Teléfono</label>
+                    <div class="field-line"></div>
+                </div>
+
+                <h3 class="form-section-title">Dirección</h3>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <input type="text" id="provincia" name="provincia" required maxlength="100">
+                        <label for="provincia">Provincia</label>
+                        <div class="field-line"></div>
+                    </div>
+
+                    <div class="form-field">
+                        <input type="text" id="canton" name="canton" required maxlength="100">
+                        <label for="canton">Cantón</label>
+                        <div class="field-line"></div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <input type="text" id="distrito" name="distrito" required maxlength="100">
+                    <label for="distrito">Distrito</label>
+                    <div class="field-line"></div>
+                </div>
+
+                <div class="form-field">
+                    <textarea id="direccion" name="direccion" required rows="3"></textarea>
+                    <label for="direccion">Dirección exacta</label>
+                    <div class="field-line"></div>
+                </div>
+
+                <button type="submit" class="registro-button">
+                    <span class="button-text">Crear Cuenta</span>
+                </button>
+            </form>
+
+            <div class="login-prompt">
+                <span>¿Ya tiene una cuenta? </span>
+                <a href="{% url 'login' %}" class="login-link">Inicie sesión</a>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

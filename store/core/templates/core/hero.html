@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hero Section{% endblock %}
+
+{% block styles %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/hero.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+    <section class="hero">
+        <h1>Hello User!</h1>
+        <p>Welcome to my E-commerce Store!</p>
+    </section>
+
+{% endblock %}

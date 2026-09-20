@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@600;700&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    height:100%;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    box-sizing: border-box;
+    background: linear-gradient(to bottom, #00d4ff, #580fbe);
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+header {
+    margin: 0;
+    padding: 14px 16px;
+    overflow: hidden;
+}
+
+header h1 {
+    float: left;
+    text-align: center;
+    font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+nav {
+    float: right;
+}
+
+nav ul {
+  list-style-type: none;
+}
+
+nav ul li {
+    float: left;
+}
+
+nav ul li a {
+  display: block;
+  text-align: center;
+  padding: 14px 16px;
+  color: black;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+ul li a:hover {
+  background-color: white;
+}
+
+main{
+    flex: 1;
+}
+
+footer {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    text-align: center;
+}
