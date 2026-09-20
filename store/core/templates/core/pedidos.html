@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis pedidos{% endblock %}
+
+{% block content %}
+<section class="pedidos">
+    <h1>Mis pedidos</h1>
+
+    {% if pedidos %}
+        <ul>
+            {% for pedido in pedidos %}
+            <li>
+                <a href="{% url 'pedido_detalle' pedido.id %}">
+                    Pedido #{{ pedido.id }} - {{ pedido.get_estado_display }} - ${{ pedido.total }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Todavía no has hecho ningún pedido.</p>
+    {% endif %}
+</section>
+{% endblock %}

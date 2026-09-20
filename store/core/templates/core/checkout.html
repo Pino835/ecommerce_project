@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<section class="checkout">
+    <h1>Confirmar pedido</h1>
+
+    <ul>
+        {% for item in items %}
+        <li>{{ item.cantidad }} x {{ item.producto.nombre }} - ${{ item.subtotal }}</li>
+        {% endfor %}
+    </ul>
+
+    <p><strong>Total: ${{ carrito.total }}</strong></p>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="direccion_envio">Dirección de envío</label>
+        <textarea id="direccion_envio" name="direccion_envio">{{ carrito.cliente.direccion }}</textarea>
+        <button type="submit">Confirmar pedido</button>
+    </form>
+</section>
+{% endblock %}

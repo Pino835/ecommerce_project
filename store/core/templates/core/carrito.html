@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Carrito{% endblock %}
+
+{% block content %}
+<section class="carrito">
+    <h1>Tu carrito</h1>
+
+    {% if carrito.items.all %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in carrito.items.all %}
+                <tr>
+                    <td>{{ item.producto.nombre }}</td>
+                    <td>{{ item.cantidad }}</td>
+                    <td>${{ item.subtotal }}</td>
+                    <td>
+                        <form action="{% url 'carrito_eliminar' item.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit">Quitar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <p><strong>Total: ${{ carrito.total }}</strong></p>
+
+        <a href="{% url 'checkout' %}">Finalizar compra</a>
+    {% else %}
+        <p>Tu carrito está vacío.</p>
+        <a href="{% url 'menu' %}">Ver productos</a>
+    {% endif %}
+</section>
+{% endblock %}

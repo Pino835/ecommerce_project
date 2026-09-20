@@ -1,11 +1,11 @@
 from django.contrib.auth.models import User
-from .models import Cliente, Producto, Categoria
+from .models import Cliente, Producto, Categoria, Carrito, CarritoItem, Pedido, PedidoItem
 from django.db import transaction
 from django.contrib.auth import authenticate
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
 
@@ -123,3 +123,100 @@ def perfil_view(request):
         }
     )
     return render(request, 'core/perfil.html', {'cliente': cliente})
+
+#CARRITO Y PEDIDOS
+
+def _get_carrito(request):
+    cliente, _ = Cliente.objects.get_or_create(
+        usuario=request.user,
+        defaults={
+            'telefono': '',
+            'provincia': '',
+            'canton': '',
+            'distrito': '',
+            'direccion': '',
+        }
+    )
+    carrito, _ = Carrito.objects.get_or_create(cliente=cliente)
+    return carrito
+
+@login_required(login_url='login')
+def carrito_view(request):
+    carrito = _get_carrito(request)
+    return render(request, 'core/carrito.html', {'carrito': carrito})
+
+@login_required(login_url='login')
+def carrito_agregar_view(request, producto_id):
+    producto = get_object_or_404(Producto, pk=producto_id, disponible=True)
+    carrito = _get_carrito(request)
+
+    item, created = CarritoItem.objects.get_or_create(
+        carrito=carrito,
+        producto=producto,
+        defaults={'cantidad': 1}
+    )
+    if not created:
+        item.cantidad += 1
+        item.save()
+
+    messages.success(request, f'{producto.nombre} agregado al carrito.')
+    return redirect('menu')
+
+@login_required(login_url='login')
+def carrito_eliminar_view(request, item_id):
+    carrito = _get_carrito(request)
+    item = get_object_or_404(CarritoItem, pk=item_id, carrito=carrito)
+    item.delete()
+    return redirect('carrito')
+
+@login_required(login_url='login')
+def checkout_view(request):
+    carrito = _get_carrito(request)
+    items = list(carrito.items.select_related('producto'))
+
+    if not items:
+        messages.error(request, 'Tu carrito está vacío.')
+        return redirect('carrito')
+
+    if request.method == 'POST':
+        direccion = request.POST.get('direccion_envio', carrito.cliente.direccion)
+
+        for item in items:
+            if item.cantidad > item.producto.stock:
+                messages.error(
+                    request,
+                    f'No hay suficiente stock de {item.producto.nombre}.'
+                )
+                return redirect('carrito')
+
+        with transaction.atomic():
+            pedido = Pedido.objects.create(
+                cliente=carrito.cliente,
+                direccion_envio=direccion,
+            )
+            for item in items:
+                PedidoItem.objects.create(
+                    pedido=pedido,
+                    producto=item.producto,
+                    cantidad=item.cantidad,
+                    precio_unitario=item.producto.precio,
+                )
+                item.producto.stock -= item.cantidad
+                item.producto.save()
+
+            carrito.items.all().delete()
+
+        messages.success(request, '¡Pedido realizado con éxito!')
+        return redirect('pedido_detalle', pedido_id=pedido.pk)
+
+    return render(request, 'core/checkout.html', {'carrito': carrito, 'items': items})
+
+@login_required(login_url='login')
+def pedido_detalle_view(request, pedido_id):
+    pedido = get_object_or_404(Pedido, pk=pedido_id, cliente__usuario=request.user)
+    return render(request, 'core/pedido_detalle.html', {'pedido': pedido})
+
+@login_required(login_url='login')
+def pedidos_view(request):
+    pedidos = Pedido.objects.filter(cliente__usuario=request.user).order_by('-creado')
+    return render(request, 'core/pedidos.html', {'pedidos': pedidos})

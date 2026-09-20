@@ -4,9 +4,9 @@ Guía para Claude Code al trabajar en este repositorio.
 
 ## Qué es este proyecto
 
-Ecommerce de portafolio personal construido con **Django 6.0.5**. Es un proyecto en etapa temprana:
-tiene catálogo de productos, autenticación de usuarios y perfil de cliente, pero **todavía no tiene
-carrito de compras, pedidos ni checkout** (lo central de un ecommerce real). Tratarlo como un WIP.
+Ecommerce de portafolio personal construido con **Django 6.0.5**. Tiene catálogo de productos,
+autenticación de usuarios, perfil de cliente, carrito de compras y checkout con creación de
+pedidos (sin pasarela de pago real todavía). Tratarlo como un WIP.
 
 ## Estructura
 
@@ -22,16 +22,17 @@ ecommerce/
     │   ├── urls.py
     │   ├── wsgi.py / asgi.py
     └── core/                 # única app Django del proyecto
-        ├── models.py         # Cliente, Categoria, Producto
-        ├── views.py          # login, registro, logout, hero, menu, perfil
+        ├── models.py         # Cliente, Categoria, Producto, Carrito, CarritoItem, Pedido, PedidoItem
+        ├── views.py          # login, registro, logout, hero, menu, perfil, carrito, checkout, pedidos
         ├── urls.py
-        ├── admin.py          # registro simple de los 3 modelos
-        ├── tests.py          # vacío
+        ├── admin.py          # registro de modelos + inline de PedidoItem en Pedido
+        ├── tests.py          # tests de carrito/checkout
         ├── migrations/
         ├── static/css/
         └── templates/
             ├── base.html
-            ├── core/ (hero.html, menu.html, perfil.html)
+            ├── core/ (hero.html, menu.html, perfil.html, carrito.html, checkout.html,
+            │         pedidos.html, pedido_detalle.html)
             └── login/ (login.html, registro.html)
 ```
 
@@ -43,6 +44,12 @@ Todos los comandos de Django (`manage.py`) se ejecutan desde `store/`, no desde 
   dirección y fecha de registro. Se crea junto con el `User` en el registro (transacción atómica).
 - **Categoria**: nombre único + descripción.
 - **Producto**: FK a Categoria (`PROTECT`), nombre, descripción, precio, stock, imagen, disponible.
+- **Carrito**: `OneToOneField` a Cliente. Propiedad `total` (suma de subtotales de sus items).
+- **CarritoItem**: FK a Carrito y Producto (únicos juntos), cantidad. Propiedad `subtotal`.
+- **Pedido**: FK a Cliente (`PROTECT`), `estado` (choices: pendiente/pagado/enviado/entregado/
+  cancelado), dirección de envío. Propiedad `total`.
+- **PedidoItem**: FK a Pedido y Producto (`PROTECT`), cantidad y `precio_unitario` congelado al
+  momento de la compra (no referencia el precio actual del producto). Propiedad `subtotal`.
 
 ## Vistas (core/views.py)
 
@@ -50,8 +57,15 @@ Todas son function-based views, sin `Form`/`ModelForm` (validación manual vía 
 
 - `login_view` / `logout_view` / `registro_view`: auth estándar de Django.
 - `hero_view`: landing pública.
-- `menu_view`: lista todas las categorías y productos (sin paginación ni filtrado).
+- `menu_view`: lista todas las categorías y productos (sin paginación ni filtrado); cada producto
+  tiene un botón "Agregar al carrito" si el usuario está autenticado.
 - `perfil_view`: requiere login; usa `get_or_create` para el `Cliente` asociado.
+- `_get_carrito`: helper interno que obtiene/crea Cliente y Carrito del usuario logueado.
+- `carrito_view` / `carrito_agregar_view` / `carrito_eliminar_view`: gestión del carrito.
+- `checkout_view`: valida stock, crea `Pedido` + `PedidoItem`s dentro de una transacción atómica,
+  descuenta stock y vacía el carrito.
+- `pedidos_view` / `pedido_detalle_view`: historial de pedidos del usuario logueado (el detalle
+  verifica que el pedido pertenezca al usuario vía `cliente__usuario=request.user`).
 
 ## Estado actual y áreas conocidas de mejora
 
@@ -67,15 +81,17 @@ a medida que se resuelvan o aparezcan puntos nuevos.
   `core/registro.html`, que no existe) cuando el email ya está registrado.
 - Repositorio git inicializado.
 
+- Carrito de compras y checkout implementados: modelos `Carrito`/`CarritoItem`/`Pedido`/`PedidoItem`,
+  vistas de agregar/quitar/checkout, e historial de pedidos. Tests en `core/tests.py` cubren
+  agregar al carrito, checkout exitoso (descuenta stock, vacía carrito) y checkout sin items.
+
 ### Pendiente / prioridad alta
 - Revisar si conviene migrar a `django-environ` si el proyecto crece (el loader actual de `.env`
   es deliberadamente simple).
-- No hay tests (`core/tests.py` está vacío).
-
-### Funcionalidad faltante (core de un ecommerce)
-- No hay carrito de compras, ni modelo de `Pedido`/`OrderItem`, ni flujo de checkout/pago.
+- No hay pasarela de pago real (el checkout crea el pedido en estado `pendiente` directamente).
 - `menu_view` no pagina ni filtra por categoría/búsqueda.
-- No hay `Form`/`ModelForm` para registro ni edición de perfil (validación manual actualmente).
+- No hay `Form`/`ModelForm` para registro, perfil ni checkout (validación manual actualmente).
+- No hay forma de editar cantidad en el carrito (solo agregar de a uno y quitar el item completo).
 
 ## Convenciones a seguir al modificar el código
 

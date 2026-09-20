@@ -24,14 +24,20 @@
 
     <div class="productos-cards">
         {% for producto in productos %}
-        <a href="#" class="card">
+        <div class="card">
             <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
             <div class="container">
                 <h4><b>{{ producto.nombre }}</b></h4>
                 <p>{{ producto.descripcion }}</p>
                 <p>Price: ${{ producto.precio }}</p>
+                {% if request.user.is_authenticated %}
+                <form action="{% url 'carrito_agregar' producto.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Agregar al carrito</button>
+                </form>
+                {% endif %}
             </div>
-        </a>
+        </div>
         {% endfor %}
     </div>
 

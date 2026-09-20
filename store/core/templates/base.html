@@ -24,6 +24,8 @@
                         {% if request.path != '/menu/' %}
                             <li><a href="{% url 'menu' %}">Volver al menú</a></li>
                         {% endif %}
+                        <li><a href="{% url 'carrito' %}">Carrito</a></li>
+                        <li><a href="{% url 'pedidos' %}">Mis pedidos</a></li>
                         <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
                     {% else %}
                         <li><a href="{% url 'login' %}">Ingresar</a></li>
